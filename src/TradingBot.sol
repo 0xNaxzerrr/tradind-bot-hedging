@@ -18,10 +18,10 @@ contract TradingBot is Ownable, ReentrancyGuard {
     ImpermanentLossCalculator public immutable ilCalculator;
 
     /// @notice Uniswap V2 pool being monitored
-    IUniswapV2Pair public immutable pool;
+    IUniswapV2Pair public pool;
 
     /// @notice Router contract for Uniswap interactions
-    IUniswapV2Router public immutable router;
+    IUniswapV2Router public router;
 
     /// @notice Minimum threshold for rebalancing (in basis points)
     uint256 public rebalanceThreshold;
@@ -61,10 +61,16 @@ contract TradingBot is Ownable, ReentrancyGuard {
         uint256 timestamp
     );
 
+    /// @notice Event emitted when pool is updated
+    event PoolUpdated(address indexed oldPool, address indexed newPool);
+
+    /// @notice Event emitted when router is updated
+    event RouterUpdated(address indexed oldRouter, address indexed newRouter);
+
     /// @notice Constructor initializes the contract with required addresses
     /// @param _ilCalculator Address of ImpermanentLossCalculator contract
-    /// @param _pool Address of Uniswap V2 pool
-    /// @param _router Address of Uniswap V2 router
+    /// @param _pool Address of initial Uniswap V2 pool
+    /// @param _router Address of initial Uniswap V2 router
     /// @param _rebalanceThreshold Initial rebalance threshold in basis points
     constructor(
         address _ilCalculator,
@@ -72,14 +78,32 @@ contract TradingBot is Ownable, ReentrancyGuard {
         address _router,
         uint256 _rebalanceThreshold
     ) Ownable(msg.sender) {
+        require(_ilCalculator != address(0), "Invalid calculator address");
+        require(_pool != address(0), "Invalid pool address");
+        require(_router != address(0), "Invalid router address");
+
         ilCalculator = ImpermanentLossCalculator(_ilCalculator);
         pool = IUniswapV2Pair(_pool);
         router = IUniswapV2Router(_router);
         rebalanceThreshold = _rebalanceThreshold;
+    }
 
-        // Approve router for token transfers
-        IERC20(pool.token0()).approve(_router, type(uint256).max);
-        IERC20(pool.token1()).approve(_router, type(uint256).max);
+    /// @notice Updates the pool address
+    /// @param _newPool Address of the new Uniswap V2 pool
+    function updatePool(address _newPool) external onlyOwner {
+        require(_newPool != address(0), "Invalid pool address");
+        address oldPool = address(pool);
+        pool = IUniswapV2Pair(_newPool);
+        emit PoolUpdated(oldPool, _newPool);
+    }
+
+    /// @notice Updates the router address
+    /// @param _newRouter Address of the new Uniswap V2 router
+    function updateRouter(address _newRouter) external onlyOwner {
+        require(_newRouter != address(0), "Invalid router address");
+        address oldRouter = address(router);
+        router = IUniswapV2Router(_newRouter);
+        emit RouterUpdated(oldRouter, _newRouter);
     }
 
     /// @notice Opens a new LP position
@@ -105,6 +129,10 @@ contract TradingBot is Ownable, ReentrancyGuard {
             address(this),
             token1Amount
         );
+
+        // Approve router for token transfers
+        IERC20(pool.token0()).approve(address(router), token0Amount);
+        IERC20(pool.token1()).approve(address(router), token1Amount);
 
         // Add liquidity to Uniswap
         (uint256 amount0, uint256 amount1, uint256 liquidity) = router
@@ -149,6 +177,9 @@ contract TradingBot is Ownable, ReentrancyGuard {
         // Get LP token balance
         uint256 liquidity = IERC20(address(pool)).balanceOf(address(this));
         require(liquidity > 0, "No liquidity to remove");
+
+        // Approve router for LP token
+        IERC20(address(pool)).approve(address(router), liquidity);
 
         // Remove liquidity
         (uint256 amount0, uint256 amount1) = router.removeLiquidity(
@@ -224,7 +255,7 @@ contract TradingBot is Ownable, ReentrancyGuard {
     /// @return hedgeAmount Current hedge position size
     function getCurrentHedgePosition()
         internal
-        view
+        pure
         returns (uint256 hedgeAmount)
     {
         // TODO: Implement Binance API integration
