@@ -68,12 +68,12 @@ cast send $TRADING_BOT_ADDRESS "openPosition(uint256,uint256,uint256)" \
     --rpc-url $RPC_URL --private-key $PRIVATE_KEY
 ```
 
-### Checking Rebalance Status
+Checking Rebalance Status
 ```bash
 Copycast call $TRADING_BOT_ADDRESS "checkRebalance()" --rpc-url $RPC_URL
 ```
 
-### Closing a Position
+Closing a Position
 ```bash
 Copycast send $TRADING_BOT_ADDRESS "closePosition(uint256,uint256)" \
     $MIN_TOKEN0 $MIN_TOKEN1 \
