@@ -6,11 +6,11 @@ import "./interfaces/IUniswapV2Pair.sol";
 import "./interfaces/IUniswapV2Router.sol";
 import "./utils/ImpermanentLossCalculator.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /// @title Trading Bot for Hedging Impermanent Loss
-/// @author YourName
+/// @author 0xNaxzerrr
 /// @notice Manages LP positions and hedging strategy for Uniswap V2 pools
 /// @dev Implements IL hedging strategy using ImpermanentLossCalculator
 contract TradingBot is Ownable, ReentrancyGuard {
