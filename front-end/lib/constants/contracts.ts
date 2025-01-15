@@ -1,0 +1,9 @@
+// lib/constants/contracts.ts
+export const CONTRACTS = {
+    TRADING_BOT: '0x1bce275dC0f3bDe0e96B60fDe8f4dE12a4dEaBbd',
+    IL_CALCULATOR: '0x426638105fbd5B246068DF0cA672366b50255820',
+    PRICE_CALCULATOR: '0xEBD5B476aEd1a7f8301575270D75edefA0dbFf5E',
+    HEDGING_STRATEGY: '0xda4E73cfED29b817BE36A07bd82958BF9322f74a'
+  } as const;
+  
+  export const CHAIN_ID = 11155111; // Sepolia

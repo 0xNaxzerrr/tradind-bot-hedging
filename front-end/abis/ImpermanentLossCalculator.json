@@ -1,0 +1,185 @@
+{
+  "abi": [
+    {
+      "type": "function",
+      "name": "calculateHedgeAmount",
+      "inputs": [
+        {
+          "name": "pool",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "position",
+          "type": "tuple",
+          "internalType": "struct ImpermanentLossCalculator.PoolPosition",
+          "components": [
+            {
+              "name": "token0Amount",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "token1Amount",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "initialPrice",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "initialLiquidity",
+              "type": "uint256",
+              "internalType": "uint256"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "hedgeAmount",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "calculateImpermanentLoss",
+      "inputs": [
+        {
+          "name": "initialPrice",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "currentPrice",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "liquidityProvided",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "impermanentLoss",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "pure"
+    },
+    {
+      "type": "function",
+      "name": "calculateTotalValue",
+      "inputs": [
+        {
+          "name": "position",
+          "type": "tuple",
+          "internalType": "struct ImpermanentLossCalculator.PoolPosition",
+          "components": [
+            {
+              "name": "token0Amount",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "token1Amount",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "initialPrice",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "initialLiquidity",
+              "type": "uint256",
+              "internalType": "uint256"
+            }
+          ]
+        },
+        {
+          "name": "currentPrice",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "totalValue",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "pure"
+    },
+    {
+      "type": "function",
+      "name": "needsRebalancing",
+      "inputs": [
+        {
+          "name": "currentHedge",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "requiredHedge",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "threshold",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool",
+          "internalType": "bool"
+        }
+      ],
+      "stateMutability": "pure"
+    },
+    {
+      "type": "event",
+      "name": "HedgeCalculated",
+      "inputs": [
+        {
+          "name": "timestamp",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "currentHedge",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "requiredHedge",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "impermanentLoss",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ],
+      "anonymous": false
+    }
+  ]
+}
