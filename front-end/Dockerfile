@@ -8,16 +8,16 @@ WORKDIR /app
 RUN apk add --no-cache git
 
 # Copy package files
-COPY package*.json ./
+COPY front-end/package.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
 # Copy the frontend code
-COPY . .
+COPY front-end/ .
 
-# Copy ABI files from the parent directory
-COPY ../out /app/out
+# Copy contract artifacts
+COPY out /app/out
 
 # Run the build scripts
 RUN npm run copy-abis || true
