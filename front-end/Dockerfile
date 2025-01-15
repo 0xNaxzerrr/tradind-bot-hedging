@@ -4,13 +4,13 @@ FROM node:20-alpine AS builder
 # Set working directory
 WORKDIR /app
 
-# Install git for potential dependencies
+# Install git and required dependencies
 RUN apk add --no-cache git
 
 # Copy package files
 COPY front-end/package.json ./
 
-# Install dependencies
+# Install dependencies with correct permissions
 RUN npm install
 
 # Copy the frontend code
@@ -18,6 +18,10 @@ COPY front-end/ .
 
 # Copy contract artifacts
 COPY out /app/out
+
+# Ensure correct ownership and permissions
+RUN chown -R node:node /app
+USER node
 
 # Run the build scripts
 RUN npm run copy-abis || true
