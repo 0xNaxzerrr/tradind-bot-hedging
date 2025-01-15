@@ -5,13 +5,13 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copy package files
-COPY front-end/package.json front-end/package-lock.json* ./
+COPY package*.json ./
 
 # Install dependencies
 RUN npm ci
 
 # Copy the rest of the application code
-COPY front-end/ .
+COPY . .
 
 # Run the build script which includes ABI copy
 RUN npm run copy-abis
@@ -23,7 +23,7 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 
 # Set environment to production
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 # Create a non-root user
 RUN addgroup --system --gid 1001 nodejs
@@ -44,5 +44,5 @@ USER nextjs
 EXPOSE 3000
 
 # Set the command to run your app
-ENV PORT 3000
+ENV PORT=3000
 CMD ["node", "server.js"]
