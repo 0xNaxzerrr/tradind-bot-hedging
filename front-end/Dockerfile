@@ -18,24 +18,15 @@ RUN npm install
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy installed dependencies and other files
+# Copy installed dependencies and source files
 COPY --from=deps /app/node_modules ./node_modules
 COPY front-end/ ./
-COPY out /app/out
-
-# Ensure correct permissions
-RUN chmod +x node_modules/.bin/* && \
-    ls -la node_modules/.bin/
 
 # Set environment variables
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_PATH=/app/node_modules
 
-# Debug the contract files
-RUN ls -la /app/out || true
-
-# Skip copyArtifacts for now and just build
-RUN node /app/node_modules/next/dist/bin/next build
+# Build the application
+RUN npm run build
 
 # Stage 3: Runner
 FROM node:20-alpine AS runner
