@@ -4,17 +4,23 @@ FROM node:20-alpine AS builder
 # Set working directory
 WORKDIR /app
 
+# Install git for potential dependencies
+RUN apk add --no-cache git
+
 # Copy package files
 COPY package*.json ./
 
 # Install dependencies
 RUN npm ci
 
-# Copy the rest of the application code
+# Copy the frontend code
 COPY . .
 
-# Run the build script which includes ABI copy
-RUN npm run copy-abis
+# Copy ABI files from the parent directory
+COPY ../out /app/out
+
+# Run the build scripts
+RUN npm run copy-abis || true
 RUN npm run build
 
 # Stage 2: Production environment
