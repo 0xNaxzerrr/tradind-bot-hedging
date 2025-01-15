@@ -21,15 +21,21 @@ WORKDIR /app
 # Copy installed dependencies and other files
 COPY --from=deps /app/node_modules ./node_modules
 COPY front-end/ ./
-COPY out ./out
+COPY out /app/out
+
+# Ensure correct permissions
+RUN chmod +x node_modules/.bin/* && \
+    ls -la node_modules/.bin/
 
 # Set environment variables
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_PATH=/app/node_modules
 
-# Run build commands using full path
-RUN /app/node_modules/.bin/tsx scripts/copyArtifacts.ts || true && \
-    /app/node_modules/.bin/next build
+# Debug the contract files
+RUN ls -la /app/out || true
+
+# Skip copyArtifacts for now and just build
+RUN node /app/node_modules/next/dist/bin/next build
 
 # Stage 3: Runner
 FROM node:20-alpine AS runner
