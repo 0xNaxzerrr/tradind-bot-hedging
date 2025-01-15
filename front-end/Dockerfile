@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1.4
-
 # Stage 1: Install dependencies
 FROM node:20-alpine AS deps
 WORKDIR /app
@@ -27,11 +25,11 @@ COPY out ./out
 
 # Set environment variables
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV PATH /app/node_modules/.bin:$PATH
+ENV NODE_PATH=/app/node_modules
 
-# Run build commands
-RUN npx tsx scripts/copyArtifacts.ts || true && \
-    npx next build
+# Run build commands using full path
+RUN /app/node_modules/.bin/tsx scripts/copyArtifacts.ts || true && \
+    /app/node_modules/.bin/next build
 
 # Stage 3: Runner
 FROM node:20-alpine AS runner
