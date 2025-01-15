@@ -1,58 +1,52 @@
-# Stage 1: Build environment
-FROM node:20-alpine AS builder
-
-# Set working directory
+# Stage 1: Install dependencies
+FROM node:20-alpine AS deps
 WORKDIR /app
 
-# Install git and required dependencies
+# Install build dependencies
 RUN apk add --no-cache git
 
-# Copy package files
+# Copy only package files for efficient caching
 COPY front-end/package.json ./
 
-# Install dependencies with correct permissions
+# Install dependencies
 RUN npm install
 
-# Copy the frontend code
-COPY front-end/ .
-
-# Copy contract artifacts
-COPY out /app/out
-
-# Ensure correct ownership and permissions
-RUN chown -R node:node /app
-USER node
-
-# Run the build scripts
-RUN npm run copy-abis || true
-RUN npm run build
-
-# Stage 2: Production environment
-FROM node:20-alpine AS runner
-
+# Stage 2: Builder
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Set environment to production
+# Copy installed dependencies
+COPY --from=deps /app/node_modules ./node_modules
+COPY front-end/ ./
+COPY out ./out
+
+# Build the application
+RUN npm run copy-abis || true \
+    && npm run build
+
+# Stage 3: Runner
+FROM node:20-alpine AS runner
+WORKDIR /app
+
 ENV NODE_ENV=production
 
-# Create a non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Install production dependencies only
+COPY front-end/package.json ./
+RUN npm install --omit=dev
 
-# Copy necessary files from builder
+# Copy built application
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-# Set correct permissions
-RUN chown -R nextjs:nodejs /app
+# Create a non-root user
+RUN addgroup --system --gid 1001 nodejs \
+    && adduser --system --uid 1001 nextjs \
+    && chown -R nextjs:nodejs /app
 
-# Switch to non-root user
 USER nextjs
 
-# Expose the port your app runs on
 EXPOSE 3000
-
-# Set the command to run your app
 ENV PORT=3000
+
 CMD ["node", "server.js"]
